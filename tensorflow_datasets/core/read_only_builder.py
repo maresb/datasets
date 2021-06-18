@@ -16,6 +16,7 @@
 """Load Datasets without reading dataset generation code."""
 
 import os
+from pathlib import Path
 import typing
 from typing import Any, Optional, Tuple, Type
 
@@ -46,8 +47,12 @@ class ReadOnlyBuilder(
     Raises:
       FileNotFoundError: If the builder_dir does not exists.
     """
-    builder_dir = os.path.expanduser(builder_dir)
-    info_path = os.path.join(builder_dir, dataset_info.DATASET_INFO_FILENAME)
+    if not isinstance(builder_dir, Path):
+        builder_dir = Path(builder_dir)
+    builder_dir = builder_dir.expanduser()
+    info_path = builder_dir / dataset_info.DATASET_INFO_FILENAME
+    # I get stuck at the next line due to <https://github.com/tensorflow/tensorflow/blob/a4dfb8d1a71385bd6d122e4f27f86dcebb96712d/tensorflow/python/lib/io/file_io.py#L291>
+    # which brutally converts any Path object into a bytestring representation. :(    
     if not tf.io.gfile.exists(info_path):
       raise FileNotFoundError(
           f'Could not load `ReadOnlyBuilder`: {info_path} does not exists.'
