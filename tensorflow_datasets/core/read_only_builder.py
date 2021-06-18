@@ -51,9 +51,7 @@ class ReadOnlyBuilder(
         builder_dir = Path(builder_dir)
     builder_dir = builder_dir.expanduser()
     info_path = builder_dir / dataset_info.DATASET_INFO_FILENAME
-    # I get stuck at the next line due to <https://github.com/tensorflow/tensorflow/blob/a4dfb8d1a71385bd6d122e4f27f86dcebb96712d/tensorflow/python/lib/io/file_io.py#L291>
-    # which brutally converts any Path object into a bytestring representation. :(    
-    if not tf.io.gfile.exists(info_path):
+    if not info_path.exists():
       raise FileNotFoundError(
           f'Could not load `ReadOnlyBuilder`: {info_path} does not exists.'
       )
